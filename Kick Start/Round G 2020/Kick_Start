@@ -1,0 +1,278 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define fn(x) return cout << x << endl, 0
+#define prs(x) cout << x << " "
+#define prl(x) cout << x << endl
+#define pr(x) cout << x
+#define pi 3.14159265358979323846264338327950
+
+typedef long long ll;
+ll MOD = (ll)1000000007;
+
+ll gcd(ll a, ll b)
+{
+  return (!b ? a : gcd(b, a % b));
+}
+int gcd(int a, int b)
+{
+  return (!b ? a : gcd(b, a % b));
+}
+
+ll lcm(ll a, ll b)
+{
+  return a * b / gcd(a, b);
+}
+
+int pc(ll x)
+{
+  return __builtin_popcount(x);
+}
+
+int lsf(ll x)
+{
+  return x ^ (x & (x - 1));
+}
+
+void prv(vector<int> vec)
+{
+  for (auto v : vec)
+    cout << v << " ";
+}
+ll exGcd(ll a, ll b, ll &x, ll &y)
+{
+  if (a < 0)
+  {
+    ll r = exGcd(-a, b, x, y);
+    x *= -1;
+    return r;
+  }
+  if (b < 0)
+  {
+    ll r = exGcd(a, -b, x, y);
+    y *= -1;
+    return r;
+  }
+  if (!b)
+  {
+    x = 1, y = 0;
+    return a;
+  }
+  ll prevX, prevY;
+  ll gcd = exGcd(b, a % b, prevX, prevY);
+  x = prevY;
+  y = prevX - a / b * prevY;
+  return gcd;
+}
+/*bool cmp(const pair<char, int> &a,
+         const pair<char, int> &b)
+{
+    return (a != b ? a < b : a.second < b.second);
+}*/
+bool cmp(const pair<int, int> &a, const pair<int, int> &b)
+{
+  return a.first < b.first;
+}
+
+bool sameParity(ll a, ll b)
+{
+  return (a % 2 == b % 2);
+}
+
+vector<int> ModMulInvRange(int p)
+{
+  vector<int> inv(p - 1, 1);
+  for (int i = 2; i < p; ++i)
+    inv[i] = (p - (p / i) * inv[p % i] % p) % p;
+  return inv;
+}
+ll pow(ll a, ll k)
+{
+  if (!k)
+    return 1;
+  ll res = pow(a, k >> 1);
+  res = (res * res);
+  if (k & 1)
+    res *= a;
+  return res;
+}
+
+// (a^k) % m
+ll pow(ll a, ll k, ll m)
+{
+  if (!k)
+    return 1;
+  ll res = pow(a, k >> 1, m);
+  res = (res * res) % m;
+  if (k & 1)
+    res = (res * a) % m;
+  return res % m;
+}
+ll phi(ll m)
+{
+  int count = 0;
+  ll p, res = 1, nn = m;
+  while (!(nn % 2))
+    ++count, nn >>= 1;
+  if (count)
+    res *= (1 << (count - 1));
+  for (ll i = 3; i * i <= m; i += 2)
+  {
+    p = 1;
+    while (!(nn % i))
+      nn /= i, p *= i;
+    if (p != 1)
+      res *= (p / i * (i - 1));
+  }
+  if (nn != 1)
+    res *= (nn - 1);
+  return res;
+}
+
+// N FACTORIAL mod m
+ll fact(ll n, ll m)
+{
+  ll res = 1;
+  for (int i = 2; i <= n; ++i)
+    res *= i, res %= m;
+  return res;
+}
+
+// m is prime
+ll modMulInv(ll a, ll m)
+{
+  return pow(a, m - 2, m);
+}
+
+// mod m
+ll nCr(ll n, ll r, ll m)
+{
+  if (n < r)
+    return 0;
+  return (fact(n, m) * modMulInv((fact(n - r, m) * fact(r, m)) % m, MOD)) % m; // if n can be large and called multiple times, preprocess fact array
+}
+
+void tst(bool bol)
+{
+  cout << (bol ? "YES" : "NO") << '\n';
+}
+void tst(bool bol1, bool bol2)
+{
+  cout << (bol1 && bol2 ? "YES" : "NO") << '\n';
+}
+
+void scan(int n, vector<int> &vec)
+{
+  int val;
+  for (int i = 0; i < n; ++i)
+  {
+    cin >> val;
+    vec.push_back(val);
+  }
+}
+void scan(int n, vector<ll> &vec)
+{
+  ll val;
+  for (int i = 0; i < n; ++i)
+  {
+    cin >> val;
+    vec.push_back(val);
+  }
+}
+
+//num%n "num +/-"
+int mod(int num, int n)
+{
+  if (num >= 0)
+    return num % n;
+  num *= -1;
+  num %= n;
+  return (num ? n - num : num);
+}
+
+int maxbit(int x) // 7->2 , 8->3
+{
+  int res = 0;
+  ll mul = 1;
+  while (mul * 2 <= x)
+    mul *= 2, ++res;
+  return res;
+}
+
+string str;
+int n;
+bool is(int i, char c)
+{
+  if (c == 'K')
+  {
+    if (i + 1 < n && str[i + 1] == 'I' && i + 2 < n && str[i + 2] == 'C' && i + 3 < n && str[i + 3] == 'K')
+      return true;
+    return false;
+  }
+  else
+  {
+    if (i + 1 < n && str[i + 1] == 'T' && i + 2 < n && str[i + 2] == 'A' && i + 3 < n && str[i + 3] == 'R' && i + 4 < n && str[i + 4] == 'T')
+      return true;
+    return false;
+  }
+}
+int main()
+{
+  ios_base::sync_with_stdio(false);
+  cin.tie(0);
+  cout.tie(0);
+
+  int cntt = 1;
+  int t;
+  vector<int> kk, ss, suffs;
+  cin >> t;
+  while (t--)
+  {
+    int ans = 0;
+    cin >> str;
+    kk.clear(), ss.clear(), suffs.clear();
+    n = str.size();
+    kk.resize(n + 5);
+    ss.resize(n + 5);
+    suffs.resize(n + 5);
+    int i = 0;
+    char c = 'K';
+    while (i < n)
+    {
+      if (str[i] != c)
+      {
+        ++i;
+        continue;
+      }
+      if (!is(i, c))
+      {
+        ++i;
+        continue;
+      }
+      ++kk[i++];
+    }
+    c = 'S';
+    i = 0;
+    while (i < n)
+    {
+      if (str[i] != c)
+      {
+        ++i;
+        continue;
+      }
+      if (!is(i, c))
+      {
+        ++i;
+        continue;
+      }
+      ++ss[i++];
+    }
+    suffs[n - 1] = ss[n - 1];
+    for (int i = n - 2; i >= 0; --i)
+      suffs[i] = suffs[i + 1] + ss[i];
+    for (int i = 0; i < n; ++i)
+      if (kk[i])
+        ans += suffs[i];
+    cout << "Case #" << cntt++ << ": " << ans << '\n';
+  }
+}
