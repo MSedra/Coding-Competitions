@@ -1,0 +1,119 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define fn(x) return cout << x << endl, 0
+#define prs(x) cout << x << " "
+#define prl(x) cout << x << endl
+#define pr(x) cout << x
+#define pi 3.14159265358979323846264338327950
+#define child1 (index << 1) + 1
+#define child2 (index << 1) + 2
+
+typedef long long ll;
+ll MOD = (ll)1000000007;
+
+typedef long long ll;
+vector<pair<int, ll>> segmentTree;
+vector<int> vec;
+
+void construct(int index, int i, int j)
+{
+  if (j - i + 1 == 1)
+  {
+    segmentTree[index] = {1, vec[i]};
+    return;
+  }
+  int mid = (i + j) / 2;
+  construct(child1, i, mid);
+  construct(child2, mid + 1, j);
+  segmentTree[index].first = segmentTree[child1].first + segmentTree[child2].first;
+  segmentTree[index].second = segmentTree[child1].second + segmentTree[child2].second;
+}
+
+pair<int, ll> query(int index, int i, int j, int l, int r)
+{
+  if (r < i || l > j)
+    return {0, 0};
+  if (i >= l && j <= r)
+    return segmentTree[index];
+  int mid = (i + j) / 2;
+  auto r1 = query(child1, i, mid, l, r);
+  auto r2 = query(child2, mid + 1, j, l, r);
+  return {r1.first + r2.first, r1.second + r2.second};
+}
+
+int main()
+{
+  ios_base::sync_with_stdio(false);
+  cin.tie(0);
+  cout.tie(0);
+
+  int cntt = 1;
+  int t;
+  cin >> t;
+  while (t--)
+  {
+    int n, w;
+    vec.clear(), segmentTree.clear();
+    ll ans = LONG_LONG_MAX;
+    ll currAns;
+    cin >> w >> n;
+    segmentTree.resize((4 * w) + 5);
+    vec.resize(w);
+    for (int i = 0; i < w; ++i)
+      cin >> vec[i];
+    sort(vec.begin(), vec.end());
+    construct(0, 0, w - 1);
+    for (int i = 0; i < w; ++i)
+    {
+      currAns = LONG_LONG_MAX;
+      int l, r;
+      l = vec[i] - n / 2;
+      r = vec[i] + n / 2;
+      if (n % 2 == 0)
+        ++l;
+      if (l <= 0)
+        l += n;
+      if (r > n)
+        r -= n;
+      l = lower_bound(vec.begin(), vec.end(), l) - vec.begin();
+      r = upper_bound(vec.begin(), vec.end(), r) - vec.begin() - 1;
+      if (l < i)
+      {
+        currAns = 0;
+        auto fr = query(0, 0, w - 1, l, i - 1);
+        currAns += (ll)fr.first * vec[i] - fr.second;
+      }
+      else if (l > i)
+      {
+        currAns = 0;
+        auto fr = query(0, 0, w - 1, 0, i - 1);
+        currAns += (ll)fr.first * vec[i] - fr.second;
+        fr = query(0, 0, w - 1, l, w - 1);
+        currAns += (ll)fr.first * n - fr.second;
+        currAns += (ll)fr.first * vec[i];
+      }
+      if (r > i)
+      {
+        if (currAns == LONG_LONG_MAX)
+          currAns = 0;
+        auto fr = query(0, 0, w - 1, i + 1, r);
+        currAns += fr.second - (ll)fr.first * vec[i];
+      }
+      else if (r < i)
+      {
+        if (currAns == LONG_LONG_MAX)
+          currAns = 0;
+        auto fr = query(0, 0, w - 1, i + 1, w - 1);
+        currAns += fr.second - (ll)fr.first * vec[i];
+        fr = query(0, 0, w - 1, 0, r);
+        currAns += fr.second;
+        currAns += (ll)fr.first * (n - vec[i]);
+      }
+      ans = min(ans, currAns);
+    }
+    if (ans == LONG_LONG_MAX)
+      ans = 0;
+    cout << "Case #" << cntt++ << ": " << ans << '\n';
+  }
+}
